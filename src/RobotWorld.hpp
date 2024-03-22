@@ -31,111 +31,52 @@ namespace Model
 	class RobotWorld : 	public ModelObject
 	{
 		public:
-			/**
-			 *
-			 */
 			static RobotWorld& getRobotWorld();
-			/**
-			 *
-			 */
 			RobotPtr newRobot(	const std::string& aName = "New Robot",
 								const wxPoint& aPosition = wxPoint( -1, -1),
 								bool aNotifyObservers = true);
-			/**
-			 *
-			 */
 			WayPointPtr newWayPoint(const std::string& aName = "New WayPoint",
 									const wxPoint& aPosition = wxPoint( -1, -1),
 									bool aNotifyObservers = true);
-			/**
-			 *
-			 */
 			GoalPtr newGoal(const std::string& aName = "New Goal",
 							const wxPoint& aPosition = wxPoint( -1, -1),
 							bool aNotifyObservers = true);
-			/**
-			 *
-			 */
 			WallPtr newWall(const wxPoint& aPoint1,
 							const wxPoint& aPoint2,
 							bool aNotifyObservers = true);
-			/**
-			 *
-			 */
 			void deleteRobot( 	RobotPtr aRobot,
 								bool aNotifyObservers = true);
-			/**
-			 *
-			 */
 			void deleteWayPoint( 	WayPointPtr aWayPoint,
 									bool aNotifyObservers = true);
-			/**
-			 *
-			 */
 			void deleteGoal( 	GoalPtr aGoal,
 								bool aNotifyObservers = true);
-			/**
-			 *
-			 */
 			void deleteWall( 	WallPtr aWall,
 								bool aNotifyObservers = true);
-			/**
-			 *
-			 */
 			RobotPtr getRobot( const std::string& aName) const;
-			/**
-			 *
-			 */
 			RobotPtr getRobot( const Base::ObjectId& anObjectId) const;
-			/**
-			 *
-			 */
 			WayPointPtr getWayPoint( const std::string& aName) const;
-			/**
-			 *
-			 */
 			WayPointPtr getWayPoint( const Base::ObjectId& anObjectId) const;
-			/**
-			 *
-			 */
 			GoalPtr getGoal( const std::string& aName) const;
-			/**
-			 *
-			 */
 			GoalPtr getGoal( const Base::ObjectId& anObjectId) const;
-			/**
-			 *
-			 */
 			WallPtr getWall( const Base::ObjectId& anObjectId) const;
-			/**
-			 *
-			 */
 			const std::vector< RobotPtr >& getRobots() const;
-			/**
-			 *
-			 */
 			const std::vector< WayPointPtr >& getWayPoints() const;
-			/**
-			 *
-			 */
 			const std::vector< GoalPtr >& getGoals() const;
-			/**
-			 *
-			 */
 			const std::vector< WallPtr >& getWalls() const;
-			/**
-			 *
-			 */
-			void populate( int aNumberOfWalls = 2);
-			/**
-			 *
-			 */
+			void populate(const int &worldNumber);
 			void unpopulate( bool aNotifyObservers = true);
-			/**
-			 *
-			 */
 			std::string asCode() const;
-			/**
+
+			//Worlds: 
+			void createDefaultWorld(bool notifyObserver = true);
+			void createStudentWorld1(bool notifyObserver = true);
+			void createStudentWorld2(bool notifyObserver = true);
+
+            void createStudentWorld3(bool notifyObserver = true);
+
+            void createWorldBorder(bool notifyObserver = true);
+
+            /**
 			 *
 			 * @param aKeepObjects Keep the objects with these ObjectIdsin the world
 			 * @param aNotifyObservers
@@ -156,14 +97,9 @@ namespace Model
 			virtual std::string asDebugString() const override;
 			//@}
 
+
 		protected:
-			/**
-			 *
-			 */
 			RobotWorld() = default;
-			/**
-			 *
-			 */
 			virtual ~RobotWorld();
 
 		private:

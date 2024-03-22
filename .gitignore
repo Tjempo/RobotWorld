@@ -7,3 +7,8 @@
 /docs/generated
 /configure~
 /RobotWorld.cppcheck
+.vscode/launch.json
+.vscode/settings.json
+.vscode/c_cpp_properties.json
+.vscode/settings.json
+.vscode/c_cpp_properties.json

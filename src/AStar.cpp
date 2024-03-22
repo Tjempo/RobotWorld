@@ -3,6 +3,7 @@
 #include "RobotWorld.hpp"
 #include "Shape2DUtils.hpp"
 #include "Wall.hpp"
+#include "Logger.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -122,7 +123,10 @@ namespace PathAlgorithm
 
 		int radius = static_cast<int>(std::ceil(std::sqrt( ((aRobotSize.x+1) / 2.0) * ((aRobotSize.x+1) / 2.0) + ((aRobotSize.y+1) / 2.0) * ((aRobotSize.y+1) / 2.0))));
 		//Cast van een double naar een int? 
-
+		Application::Logger::log("Robot Size: " + Utils::Shape2DUtils::asString(aRobotSize)); //Print size of robot
+		#include <string>
+		std::string str = std::to_string(radius);
+		Application::Logger::log(str);
 
 		aStart.actualCost = 0.0; 													// Cost from aStart along the best known path.
 		aStart.heuristicCost = aStart.actualCost + HeuristicCost( aStart, aGoal);	// Estimated total cost from aStart to aGoal through y.

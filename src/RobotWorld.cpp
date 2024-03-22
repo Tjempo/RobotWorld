@@ -5,6 +5,7 @@
 #include "Robot.hpp"
 #include "Wall.hpp"
 #include "WayPoint.hpp"
+#include "Trace.hpp"
 
 #include <algorithm>
 
@@ -274,28 +275,28 @@ namespace Model
 	/**
 	 *
 	 */
-	void RobotWorld::populate( int UNUSEDPARAM(aNumberOfWalls))
+	void RobotWorld::populate(const int &worldNumber)
 	{
-		RobotWorld::getRobotWorld().newRobot( "Robot", wxPoint(163,111),false); // @suppress("Avoid magic numbers")
-
-//		static const wxPoint coordinates[] = {
-//			wxPoint( 100, 25), wxPoint( 700, 25),
-//			wxPoint( 75, 200), wxPoint( 250, 600),
-//			wxPoint( 800, 300), wxPoint( 800, 700),
-//			wxPoint( 50, 825), wxPoint( 600, 825)};
-//
-//		for (int i = 0; i < 2 * aNumberOfWalls; i += 2)
-//		{
-//			RobotWorld::getRobotWorld().newWall( coordinates[i], coordinates[i + 1],false);
-//		}
-//
-//		RobotWorld::getRobotWorld().newGoal( "Goal", wxPoint(850, 500),false); // @suppress("Avoid magic numbers")
+		switch (worldNumber)
+		{
+		case 0:
+			createDefaultWorld(true);
+			break;
 		
-		RobotWorld::getRobotWorld().newWall( wxPoint(7,234), wxPoint(419,234) ,false); // @suppress("Avoid magic numbers")
-		RobotWorld::getRobotWorld().newGoal( "Goal", wxPoint(320,285),false); // @suppress("Avoid magic numbers")
-		
+		case 1: 
+			createStudentWorld1(true);
+			break;
 
-		notifyObservers();
+		case 2:
+			createStudentWorld2(true);
+			break;
+		case 3:
+			createStudentWorld3(true); //2 Robot World
+			break;
+		default:
+			TRACE_DEVELOP("No valid world");
+			break;
+		}
 	}
 	/**
 	 *
@@ -450,6 +451,71 @@ namespace Model
 		// No notification while I am in the destruction mode!
 		disableNotification();
 		unpopulate();
+	}
+
+
+	//------------------------------ WORLDS:
+	void RobotWorld::createDefaultWorld(bool notifyObserver){
+		//Create World Boarder: 
+		createWorldBorder(true);
+	
+		//Create World Walls:
+		RobotWorld::getRobotWorld().newWall( wxPoint(7,234), wxPoint(419,234) ,notifyObserver); // @suppress("Avoid magic numbers")
+
+		//Create Objects:
+		RobotWorld::getRobotWorld().newRobot("Robot", wxPoint(163,111), notifyObserver); // @suppress("Avoid magic numbers")
+		RobotWorld::getRobotWorld().newGoal("Goal", wxPoint(320,285), notifyObserver); // @suppress("Avoid magic numbers")
+
+		notifyObservers();
+	}
+
+
+	void RobotWorld::createStudentWorld1(bool notifyObserver){
+		//Create World Boarder: 
+		createWorldBorder(true);
+
+		//Create Objects:
+		RobotWorld::getRobotWorld().newRobot("Robot", wxPoint(163,111), notifyObserver); // @suppress("Avoid magic numbers")
+		RobotWorld::getRobotWorld().newGoal("Goal", wxPoint(320,285), notifyObserver); // @suppress("Avoid magic numbers")
+
+		notifyObservers();
+	}
+
+	void RobotWorld::createStudentWorld2(bool notifyObserver){
+		//Create World Boarder: 
+		createWorldBorder(true);
+	
+		//Create World Walls:
+		RobotWorld::getRobotWorld().newWall( wxPoint(7,234), wxPoint(419,234) ,notifyObserver); // @suppress("Avoid magic numbers")
+		RobotWorld::getRobotWorld().newWall( wxPoint(7,334), wxPoint(419,234) ,notifyObserver); // @suppress("Avoid magic numbers")
+
+		//Create Objects:
+		RobotWorld::getRobotWorld().newRobot("Robot", wxPoint(163,111), notifyObserver); // @suppress("Avoid magic numbers")
+		RobotWorld::getRobotWorld().newGoal("Goal", wxPoint(100,400), notifyObserver); // @suppress("Avoid magic numbers")
+
+		notifyObservers();
+	}
+
+
+	void RobotWorld::createStudentWorld3(bool notifyObserver){
+		//Create World Boarder: 
+		createWorldBorder(true);
+
+		//Create Objects:
+		RobotWorld::getRobotWorld().newRobot("Robot", wxPoint(100,100), notifyObserver); // @suppress("Avoid magic numbers")
+		RobotWorld::getRobotWorld().newGoal("Goal", wxPoint(475,475), notifyObserver); // @suppress("Avoid magic numbers")
+
+		//Set 2: more Robots
+		RobotWorld::getRobotWorld().newRobot("Bobert", wxPoint(400,400), notifyObserver); // @suppress("Avoid magic numbers")
+		RobotWorld::getRobotWorld().newGoal("Goal", wxPoint(75,75), notifyObserver); // @suppress("Avoid magic numbers")
+
+	}
+
+	void RobotWorld::createWorldBorder(bool notifyObserver){
+		RobotWorld::getRobotWorld().newWall( wxPoint(0,0), wxPoint(0,500) , notifyObserver); // Left Wall
+		RobotWorld::getRobotWorld().newWall( wxPoint(500,0), wxPoint(500,500) , notifyObserver); //Right Wall
+		RobotWorld::getRobotWorld().newWall( wxPoint(0,500), wxPoint(500,500) , notifyObserver); //Bottom Wall
+		RobotWorld::getRobotWorld().newWall( wxPoint(0,0), wxPoint(500,0) , notifyObserver); //Top Wall
 	}
 
 } // namespace Model

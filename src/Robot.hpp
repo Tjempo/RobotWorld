@@ -265,10 +265,12 @@ namespace Model
 			 *
 			 */
 			bool arrived( GoalPtr aGoal);
-			/**
-			 *
-			 */
-			bool collision();
+            bool wallCollision();
+            bool robotCollision();
+            /**
+             *
+             */
+            bool collision(); //Depreciated
 		private:
 			/**
 			 *

@@ -445,11 +445,21 @@ namespace Model
 				position.y = vertex.y;
 
 				// Stop on arrival or collision
-				if (arrived(goal) || collision())
-				{
-					Application::Logger::log(__PRETTY_FUNCTION__ + std::string(": arrived or collision"));
-					driving = false;
-				}
+				 if (arrived(goal))
+                {
+                    Application::Logger::log(__PRETTY_FUNCTION__ + std::string(": arrived"));
+                    driving = false;
+                }
+                if (wallCollision())
+                {
+                    Application::Logger::log(__PRETTY_FUNCTION__ + std::string(": wall collision"));
+                    driving = false;
+                }
+                if (robotCollision())
+                {
+                    Application::Logger::log(__PRETTY_FUNCTION__ + std::string(": robot collision"));
+                    driving = false;
+                }
 
 				notifyObservers();
 
@@ -507,36 +517,43 @@ namespace Model
 	/**
 	 *
 	 */
-	bool Robot::collision()
-	{
-		wxPoint frontLeft = getFrontLeft();
-		wxPoint frontRight = getFrontRight();
-		wxPoint backLeft = getBackLeft();
-		wxPoint backRight = getBackRight();
+	bool Robot::wallCollision()
+    {
+        wxPoint frontLeft = getFrontLeft();
+        wxPoint frontRight = getFrontRight();
+        wxPoint backLeft = getBackLeft();
+        wxPoint backRight = getBackRight();
 
-		const std::vector< WallPtr >& walls = RobotWorld::getRobotWorld().getWalls();
-		for (WallPtr wall : walls)
-		{
-			if (Utils::Shape2DUtils::intersect( frontLeft, frontRight, wall->getPoint1(), wall->getPoint2()) 	||
-				Utils::Shape2DUtils::intersect( frontLeft, backLeft, wall->getPoint1(), wall->getPoint2())		||
-				Utils::Shape2DUtils::intersect( frontRight, backRight, wall->getPoint1(), wall->getPoint2()))
-			{
-				return true;
-			}
-		}
-		const std::vector< RobotPtr >& robots = RobotWorld::getRobotWorld().getRobots();
-		for (RobotPtr robot : robots)
-		{
-			if ( getObjectId() == robot->getObjectId())
-			{
-				continue;
-			}
-			if(intersects(robot->getRegion()))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
+        const std::vector< WallPtr >& walls = RobotWorld::getRobotWorld().getWalls();
+        for (WallPtr wall : walls)
+        {
+            if (Utils::Shape2DUtils::intersect( frontLeft, frontRight, wall->getPoint1(), wall->getPoint2())     ||
+                Utils::Shape2DUtils::intersect( frontLeft, backLeft, wall->getPoint1(), wall->getPoint2())        ||
+                Utils::Shape2DUtils::intersect( frontRight, backRight, wall->getPoint1(), wall->getPoint2()))
+            {
+                Application::Logger::log("CollisionWithWall");
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool Robot::robotCollision(){
+        const std::vector< RobotPtr >& robots = RobotWorld::getRobotWorld().getRobots();
+                for (RobotPtr robot : robots)
+                {
+                    if ( getObjectId() == robot->getObjectId())
+                    {
+                        continue;
+                    }
+                    if(intersects(robot->getRegion()))
+                    {
+                        Application::Logger::log("CollisionWithRobot");
+                        return true;
+                    }
+                }
+                return false;
+    }
 
 } // namespace Model

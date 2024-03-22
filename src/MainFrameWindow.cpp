@@ -371,11 +371,13 @@ namespace Application
 		speedSpinCtrl->SetValue(static_cast<int>(10));
 		speedSpinCtrl->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED,[this](wxCommandEvent& event){this->OnSpeedSpinCtrlUpdate(event);});
 
-		std::array<std::string,3> choicesArray
+		std::array<std::string,5> choicesArray
 		{
 			"1 Default world",
 			"2 Student world 1",
-			"3 Student world 2"
+			"3 Student world 2",
+			"4 Student world 3",
+			"5 Student world 4"
 		};
 
 		sizer->Add(	worldNumber = makeRadiobox(	panel,
@@ -389,17 +391,27 @@ namespace Application
 														{
 															case 0:
 															{
-																OnWorld1(event);
+																OnWorld(event);
 																break;
 															}
 															case 1:
 															{
-																OnWorld2(event);
+																OnWorld(event);
 																break;
 															}
 															case 2:
 															{
-																OnWorld3(event);
+																OnWorld(event);
+																break;
+															}
+															case 3:
+															{
+																OnWorld(event);
+																break;
+															}
+															case 4:
+															{
+																OnWorld(event);
 																break;
 															}
 															default:
@@ -606,7 +618,7 @@ namespace Application
 	/**
 	 *
 	 */
-	void MainFrameWindow::OnWorld1( wxCommandEvent& anEvent)
+	void MainFrameWindow::OnWorld( wxCommandEvent& anEvent)
 	{
 		TRACE_DEVELOP(anEvent.GetString().ToStdString());
 
@@ -616,23 +628,6 @@ namespace Application
 	/**
 	 *
 	 */
-	void MainFrameWindow::OnWorld2( wxCommandEvent& anEvent)
-	{
-		TRACE_DEVELOP(anEvent.GetString().ToStdString());
-
-		MainSettings& mainSettings = MainApplication::getSettings();
-		mainSettings.setWorldNumber(worldNumber->GetSelection());
-	}
-	/**
-	 *
-	 */
-	void MainFrameWindow::OnWorld3( wxCommandEvent& anEvent)
-	{
-		TRACE_DEVELOP(anEvent.GetString().ToStdString());
-
-		MainSettings& mainSettings = MainApplication::getSettings();
-		mainSettings.setWorldNumber(worldNumber->GetSelection());
-	}
 	/**
 	 *
 	 */
@@ -664,27 +659,26 @@ namespace Application
 		{
 			case 0:
 			{
-				robotWorldCanvas->populate( 4);
-				// TODO Do something...
-//				std::shared_ptr<View::RobotShape> robotShape = std::dynamic_pointer_cast<View::RobotShape>(robotWorldCanvas->getSelectedShape());
-//				if(robotShape)
-//				{
-//					TRACE_DEVELOP("It should be checked...");
-//					drawOpenSetCheckbox->SetValue(robotShape->getDrawOpenSet());
-//				}else
-//				{
-//					TRACE_DEVELOP("No robotShape? It is not checked...");
-//				}
+				TRACE_DEVELOP("Student world 0");
+				robotWorldCanvas->populate(0);
 				break;
 			}
 			case 1:
 			{
-				TRACE_DEVELOP("Please create your own student world 1");
+				TRACE_DEVELOP("Student world 1");
+				robotWorldCanvas->populate(1);
 				break;
 			}
 			case 2:
 			{
-				TRACE_DEVELOP("Please create your own student world 2");
+				TRACE_DEVELOP("Student world 2");
+				robotWorldCanvas->populate(2);
+				break;
+			}
+			case 3:
+			{
+				TRACE_DEVELOP("Student world 3");
+				robotWorldCanvas->populate(3);
 				break;
 			}
 			default:
