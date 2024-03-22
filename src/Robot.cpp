@@ -152,12 +152,13 @@ namespace Model
 	/**
 	 *
 	 */
-	void Robot::startActing()
-	{
-		acting = true;
-		std::thread newRobotThread( [this]{	startDriving();});
-		robotThread.swap( newRobotThread);
-	}
+	void Robot::startActing(){
+		this->acting = true;
+
+		// Create a new thread that calls startDriving() in robotThread list
+		robotThread = std::thread([this]{startDriving();});
+}
+
 	/**
 	 *
 	 */

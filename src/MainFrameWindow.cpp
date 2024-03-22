@@ -633,10 +633,14 @@ namespace Application
 	 */
 	void MainFrameWindow::OnStartRobot( wxCommandEvent& UNUSEDPARAM(anEvent))
 	{
-		Model::RobotPtr robot = Model::RobotWorld::getRobotWorld().getRobot( "Robot");
-		if (robot && !robot->isActing())
+		for(Model::RobotPtr robot : Model::RobotWorld::getRobotWorld().getRobots())
 		{
-			robot->startActing();
+			if (robot && !robot->isActing())
+			{
+				robot->startActing();
+			}else{
+				TRACE_DEVELOP("Robot is already acting");
+			}
 		}
 	}
 	/**
