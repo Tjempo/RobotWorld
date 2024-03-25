@@ -371,13 +371,15 @@ namespace Application
 		speedSpinCtrl->SetValue(static_cast<int>(10));
 		speedSpinCtrl->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED,[this](wxCommandEvent& event){this->OnSpeedSpinCtrlUpdate(event);});
 
-		std::array<std::string,5> choicesArray
+		std::array<std::string,7> choicesArray
 		{
-			"1 Default world",
-			"2 Student world 1",
-			"3 Student world 2",
-			"4 Student world 3",
-			"5 Student world 4"
+			"Default world",
+			"Situatie 1.0",
+			"Situatie 1.1",
+			"Situatie 2.0",
+			"Situatie 2.1",
+			"Situatie 3.0",
+			"Situatie 3.1"
 		};
 
 		sizer->Add(	worldNumber = makeRadiobox(	panel,
@@ -414,6 +416,16 @@ namespace Application
 																OnWorld(event);
 																break;
 															}
+															case 5:
+															{
+																OnWorld(event);
+																break;
+															}
+															case 6:
+															{
+																OnWorld(event);
+																break;
+															}
 															default:
 															{
 																TRACE_DEVELOP("Unknown world selection");
@@ -422,7 +434,7 @@ namespace Application
 													}
 												},
 												"World number",
-												wxRA_SPECIFY_ROWS),
+												wxSHRINK | wxALIGN_CENTER), //Dit is om ervoor te zorgen dat de knoppen niet buiten het scherm komen
 					wxGBPosition( 3, 1),
 					wxGBSpan( 1, 1),
 					wxSHRINK | wxALIGN_CENTER);
@@ -636,7 +648,9 @@ namespace Application
 		for(Model::RobotPtr robot : Model::RobotWorld::getRobotWorld().getRobots())
 		{
 			if (robot && !robot->isActing())
-			{
+			{	
+				robot->getGoalName();
+
 				robot->startActing();
 			}else{
 				TRACE_DEVELOP("Robot is already acting");
@@ -663,28 +677,47 @@ namespace Application
 		{
 			case 0:
 			{
-				TRACE_DEVELOP("Student world 0");
+				TRACE_DEVELOP("Selected Default");
 				robotWorldCanvas->populate(0);
 				break;
 			}
 			case 1:
 			{
-				TRACE_DEVELOP("Student world 1");
+				TRACE_DEVELOP("Selected Situation 1");
 				robotWorldCanvas->populate(1);
 				break;
 			}
 			case 2:
 			{
-				TRACE_DEVELOP("Student world 2");
+				TRACE_DEVELOP("Selected Situation 2");
 				robotWorldCanvas->populate(2);
 				break;
 			}
 			case 3:
 			{
-				TRACE_DEVELOP("Student world 3");
+				TRACE_DEVELOP("Selected Situation 3");
 				robotWorldCanvas->populate(3);
 				break;
 			}
+			case 4:
+			{
+				TRACE_DEVELOP("Selected Situation 4");
+				robotWorldCanvas->populate(4);
+				break;
+			}
+			case 5:
+			{
+				TRACE_DEVELOP("Selected Situation 5");
+				robotWorldCanvas->populate(5);
+				break;
+			}
+			case 6:
+			{
+				TRACE_DEVELOP("Selected Situation 6");
+				robotWorldCanvas->populate(6);
+				break;
+			}
+
 			default:
 			{
 				TRACE_DEVELOP("Huh?");

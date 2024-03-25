@@ -557,4 +557,47 @@ namespace Model
                 return false;
     }
 
+	void Robot::evade() {
+    double angle = angleCollision();
+    if (angle < 45 || angle > 315){
+        Application::Logger::log("turning left");
+//todo implementation
+    }else if (angle > 225 && angle <= 315){
+        Application::Logger::log("continuing");
+        driving = true;
+    }else if (angle > 135 && angle <= 225){
+        Application::Logger::log("no collision");
+    }else if (angle > 45 && angle <= 135){
+        Application::Logger::log("waiting");
+        while (robotCollision()){
+            driving = false;
+        }
+        driving = true;
+    }
+}
+
+double Robot::angleCollision() {
+    double angle = 0;
+    const std::vector<RobotPtr> &robots =
+            RobotWorld::getRobotWorld().getRobots();
+    for (RobotPtr robot : robots) {
+        if (getObjectId() == robot->getObjectId()) {
+            continue;
+        }
+        if (intersects(robot->getRegion())) {
+            angle = Utils::Shape2DUtils::getAngle(this->position, robot->position);
+            angle = Utils::MathUtils::toDegrees(angle);
+            double currentAngle = Utils::Shape2DUtils::getAngle(front);
+            currentAngle = Utils::MathUtils::toDegrees(currentAngle);
+            angle = angle - currentAngle;
+            if (angle < 0){
+                angle = 360 + angle;
+            }
+            Application::Logger::log(std::to_string(angle));
+        }
+    }
+
+    return angle;
+}
+
 } // namespace Model

@@ -81,6 +81,7 @@ namespace Model
 			 * @return the objectId (identity) of the ModelObject
 			 */
 			const Base::ObjectId& getObjectId() const {return  objectId;}
+			void setObjectId(const Base::ObjectId& anObjectId) {this->objectId = anObjectId;}
 			/**
 			 * Converts the contained ModelObject to a std::shared_ptr<DestinationType>
 			 *

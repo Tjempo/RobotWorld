@@ -40,7 +40,8 @@ namespace Model
 									bool aNotifyObservers = true);
 			GoalPtr newGoal(const std::string& aName = "New Goal",
 							const wxPoint& aPosition = wxPoint( -1, -1),
-							bool aNotifyObservers = true);
+							bool aNotifyObservers = true
+							);
 			WallPtr newWall(const wxPoint& aPoint1,
 							const wxPoint& aPoint2,
 							bool aNotifyObservers = true);
@@ -69,10 +70,17 @@ namespace Model
 
 			//Worlds: 
 			void createDefaultWorld(bool notifyObserver = true);
-			void createStudentWorld1(bool notifyObserver = true);
-			void createStudentWorld2(bool notifyObserver = true);
+			void createStudentWorld1(bool notifyObserver = true); //Situation 1.0
+			void createStudentWorld2(bool notifyObserver = true); //Situation 1.1
 
-            void createStudentWorld3(bool notifyObserver = true);
+            void createStudentWorld3(bool notifyObserver = true); //Situation 2.0
+
+            void createStudentWorld4(bool notifyObserver = true); //Situation 2.1
+
+			void createStudentWorld5(bool notifyObserver = true); //Situation 3.0
+
+			void createStudentWorld6(bool notifyObserver = true); //Situation 3.1
+
 
             void createWorldBorder(bool notifyObserver = true);
 

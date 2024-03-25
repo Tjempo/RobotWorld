@@ -105,6 +105,11 @@ namespace Model
 			 *
 			 */
 			float getSpeed() const;
+
+			std::string getGoalName() const
+			{
+				return goalName;
+			}
 			/**
 			 *
 			 */
@@ -267,6 +272,8 @@ namespace Model
 			bool arrived( GoalPtr aGoal);
             bool wallCollision();
             bool robotCollision();
+            void evade();
+            double angleCollision();
             /**
              *
              */
@@ -296,6 +303,7 @@ namespace Model
 			 *
 			 */
 			GoalPtr goal;
+			std::string goalName;
 			/**
 			 *
 			 */
