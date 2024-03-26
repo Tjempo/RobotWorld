@@ -12,6 +12,7 @@
 #include "Point.hpp"
 #include "Region.hpp"
 #include "Size.hpp"
+#include "WayPoint.hpp"
 
 #include <iostream>
 #include <memory>
@@ -262,18 +263,22 @@ namespace Model
 			 *
 			 */
 			void drive();
-			/**
-			 *
-			 */
-			void calculateRoute( GoalPtr aGoal);
-			/**
-			 *
-			 */
-			bool arrived( GoalPtr aGoal);
+            void calculateRoute(WayPointPtr aGoal);
+            /**
+             *
+             */
+            /**
+             *
+             */
+            bool arrived( GoalPtr aGoal);
+			bool arrived( WayPointPtr tempGoal);
+
             bool wallCollision();
             bool robotCollision();
             void evade();
             double angleCollision();
+            void turnAround();
+            wxRegion expandedRegion() const;
             /**
              *
              */

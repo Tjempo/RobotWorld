@@ -19,6 +19,7 @@
 #include "StdOutTraceFunction.hpp"
 #include "Trace.hpp"
 #include "WidgetTraceFunction.hpp"
+#include "serverConfig.hpp"
 
 #include <array>
 #include <iostream>
@@ -488,6 +489,13 @@ namespace Application
 					wxGBPosition( 1, 2),
 					wxGBSpan( 1, 1),
 					wxGROW);
+					
+		sizer->Add( makeButton( panel,
+								"Synchronize",
+								[this](wxCommandEvent& anEvent){this->Sync(anEvent);}),
+					wxGBPosition( 1, 3),
+					wxGBSpan( 1, 1),
+					wxGROW);
 
 		sizer->Add( makeButton( panel,
 								"Start robot",
@@ -590,7 +598,7 @@ namespace Application
 	 */
 	void MainFrameWindow::OnAbout( wxCommandEvent& UNUSEDPARAM(anEvent))
 	{
-		wxMessageBox( "ESD 2012-present RobotWorld.\n", "About RobotWorld", wxOK | wxICON_INFORMATION, this);
+		wxMessageBox( "Dit is echt dikke bagger code \n Veel Succes sneuneuzen! \n Groet Joost :-)", "Sterf", wxOK | wxICON_INFORMATION, this);
 	}
 	/**
 	 *
@@ -645,16 +653,23 @@ namespace Application
 	 */
 	void MainFrameWindow::OnStartRobot( wxCommandEvent& UNUSEDPARAM(anEvent))
 	{
-		for(Model::RobotPtr robot : Model::RobotWorld::getRobotWorld().getRobots())
-		{
-			if (robot && !robot->isActing())
-			{	
-				robot->getGoalName();
+		// for(Model::RobotPtr robot : Model::RobotWorld::getRobotWorld().getRobots())
+		// {
+		// 	if (robot && !robot->isActing())
+		// 	{	
+		// 		robot->getGoalName();
 
-				robot->startActing();
-			}else{
-				TRACE_DEVELOP("Robot is already acting");
-			}
+		// 		robot->startActing();
+		// 	}else{
+		// 		TRACE_DEVELOP("Robot is already acting");
+		// 	}
+		// }
+
+
+		Model::RobotPtr robot = Model::RobotWorld::getRobotWorld().getRobot( "Robot");
+		if (robot && !robot->isActing())
+		{
+			robot->startActing();
 		}
 	}
 	/**
@@ -745,6 +760,38 @@ namespace Application
 			robot->startCommunicating();
 		}
 	}
+
+	void MainFrameWindow::Sync(wxCommandEvent& UNUSEDPARAM(anEvent)){
+		TRACE_DEVELOP("Syncing world...");
+		
+	
+    for(Model::RobotPtr robot : Model::RobotWorld::getRobotWorld().getRobots()){
+		if (!robot) {
+        	continue;
+    	}
+	}
+
+		std::string remoteIpAdres = SERVER_IP;
+		std::string remotePort = SERVER_PORT;
+
+		if (MainApplication::isArgGiven("-remote_ip")) {
+			remoteIpAdres = MainApplication::getArg("-remote_ip").value;
+		}
+		if (MainApplication::isArgGiven("-remote_port")) {
+			remotePort = MainApplication::getArg("-remote_port").value;
+		}
+
+		// Debug info:
+		TRACE_DEVELOP("Syncing on IP: " + remoteIpAdres);
+		TRACE_DEVELOP( "Syncing on port: " + remotePort);
+
+		
+
+
+
+
+
+	}
 	/**
 	 *
 	 */
@@ -753,23 +800,23 @@ namespace Application
 		Model::RobotPtr robot = Model::RobotWorld::getRobotWorld().getRobot( "Robot");
 		if (robot)
 		{
-			std::string remoteIpAdres = "localhost";
-			std::string remotePort = "12345";
+			std::string remoteIpAdres = SERVER_IP;
+			std::string remotePort = SERVER_PORT;
 
 			if (MainApplication::isArgGiven( "-remote_ip"))
 			{
 				remoteIpAdres = MainApplication::getArg( "-remote_ip").value;
+				TRACE_DEVELOP("Ip: " + remoteIpAdres);
 			}
 			if (MainApplication::isArgGiven( "-remote_port"))
 			{
 				remotePort = MainApplication::getArg( "-remote_port").value;
+				TRACE_DEVELOP("Port: " + remotePort);
 			}
 
 			// We will request an echo message. The response will be "Hello World", if all goes OK,
 			// "Goodbye cruel world!" if something went wrong.
-			Messaging::Client c1ient( remoteIpAdres,
-									  static_cast<unsigned short>(std::stoi(remotePort)),
-									  robot);
+			Messaging::Client c1ient( remoteIpAdres, static_cast<unsigned short>(std::stoi(remotePort)), robot);
 			Messaging::Message message( Messaging::EchoRequest, "Hello world!");
 			c1ient.dispatchMessage( message);
 		}

@@ -460,6 +460,7 @@ namespace Model
                 {
                     Application::Logger::log(__PRETTY_FUNCTION__ + std::string(": robot collision"));
                     driving = false;
+					evade();
                 }
 
 				notifyObservers();
@@ -488,8 +489,7 @@ namespace Model
 	/**
 	 *
 	 */
-	void Robot::calculateRoute(GoalPtr aGoal)
-	{
+	void Robot::calculateRoute(WayPointPtr aGoal){
 		path.clear();
 		if (aGoal)
 		{
@@ -502,6 +502,8 @@ namespace Model
 			//stopHandlingNotificationsFor( astar);
 
 			Application::Logger::setDisable( false);
+		}else{
+			Application::Logger::log( __PRETTY_FUNCTION__ + std::string(": no goal set"));
 		}
 	}
 	/**
@@ -561,7 +563,8 @@ namespace Model
     double angle = angleCollision();
     if (angle < 45 || angle > 315){
         Application::Logger::log("turning left");
-//todo implementation
+		turnAround();
+
     }else if (angle > 225 && angle <= 315){
         Application::Logger::log("continuing");
         driving = true;
@@ -599,5 +602,84 @@ double Robot::angleCollision() {
 
     return angle;
 }
+
+void Robot::turnAround() {
+    driving = true;
+    wxPoint evadePoint((getFrontRight().x + getBackRight().x) / 2,
+            (getFrontRight().y + getBackRight().y) / 2);
+    RobotWorld::getRobotWorld().newWayPoint("Point", evadePoint);
+    WayPointPtr tempPointPtr = RobotWorld::getRobotWorld().getWayPoint("Point");
+    Application::Logger::log(
+            Utils::Shape2DUtils::asString(evadePoint) + " "
+                    + Utils::Shape2DUtils::asString(position));
+    Application::Logger::log("turning");
+    calculateRoute(tempPointPtr);
+    drive();
+    if (arrived(tempPointPtr)) {
+        RobotWorld::getRobotWorld().deleteWayPoint(tempPointPtr);
+        Application::Logger::log("evadePoint reached");
+        calculateRoute(goal);
+    }
+}
+
+wxRegion Robot::expandedRegion() const {
+    int leftX = 0;
+    int leftY = 0;
+    int rightX = 0;
+    int rightY = 0;
+    if (getFrontRight().x >= getBackRight().x) {
+        rightX = getFrontRight().x + (getFrontRight().x - getBackRight().x);
+    } else {
+        rightX = getFrontRight().x + (getBackRight().x - getFrontRight().x);
+    }
+    if (getFrontRight().y >= getBackRight().y) {
+        rightY = getFrontRight().y + (getFrontRight().y - getBackRight().y);
+    } else {
+        rightY = getFrontRight().y + (getBackRight().y - getFrontRight().y);
+    }
+
+    if (getFrontLeft().x >= getBackLeft().x) {
+        leftX = getFrontLeft().x + (getFrontLeft().x - getBackLeft().x);
+    } else {
+        leftX = getFrontLeft().x + (getBackLeft().x - getFrontLeft().x);
+    }
+    if (getFrontLeft().y >= getBackLeft().y) {
+        leftY = getFrontLeft().y + (getFrontLeft().y - getBackLeft().y);
+    } else {
+        leftY = getFrontLeft().y + (getBackLeft().y - getFrontLeft().y);
+    }
+
+    wxPoint newFrontLeft(leftX, leftY);
+    wxPoint newFrontRight(rightX, rightY);
+
+    wxPoint translatedPoints[] = { newFrontRight, newFrontLeft, getBackLeft(),
+            getBackRight() };
+
+    Application::Logger::log(Utils::Shape2DUtils::asString(newFrontLeft));
+    return wxRegion(4, translatedPoints);
+}
+
+bool Robot::arrived(WayPointPtr tempGoal) {
+    if (tempGoal && intersects(tempGoal->expandedRegion())) {
+        return true;
+    }
+    return false;
+}
+
+wxRegion WayPoint::expandedRegion() const
+        {
+            // x and y are pointing to top left now
+            int x = position.x - (size.x);
+            int y = position.y - (size.y);
+
+            wxPoint originalUpperLeft( x, y);
+            wxPoint originalUpperRight( x + size.x * 2, y);
+            wxPoint originalBottomLeft( x, y + size.y * 2);
+            wxPoint originalBottomRight( x + size.x * 2, y + size.y * 2);
+
+            wxPoint originalPoints[] = { originalUpperRight, originalUpperLeft, originalBottomLeft, originalBottomRight };
+
+            return wxRegion( 4, originalPoints);
+        }
 
 } // namespace Model
