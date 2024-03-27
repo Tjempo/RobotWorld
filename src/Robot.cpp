@@ -373,9 +373,13 @@ namespace Model
 				std::ostringstream os;
 				os << position.x << " " << position.y << " " << getFront().asString();
 				aMessage.setBody(os.str());
-				// aMessage.setBody("RobotPositionRequest is now handled");
-
 				TRACE_DEVELOP("Oke here is robot location");
+
+				//Request robot from other side
+				// if(!WorldSynced){
+				// 	TRACE_DEVELOP("Getting other Robot");
+				// 	Application::MainFrameWindow::requestRobotLocation();
+				// }
 				break;
 			}
 
@@ -454,7 +458,6 @@ namespace Model
 			//ToDo: Request Goal and walls
 			TRACE_DEVELOP("Imma add the walls and goals OwO");
 		}
-
 		//Send robot position request
 		Application::MainFrameWindow::requestRobotLocation();
 	}
@@ -475,13 +478,9 @@ namespace Model
 			WorldSynced = true;
 		}else{
 			TRACE_DEVELOP("Ja stomme kneus dit is al true");
+			auto robotToo =Model::RobotWorld::getRobotWorld().getRobot("Bober");
+			robotToo->setPosition(wxPoint(x, y));
 		}
-
-		// else{
-		// 	auto robotToo = Model::RobotWorld::getRobotWorld().getRobot("Bober");
-		// 	robotToo->setPosition(wxPoint(x, y));
-		// }
-		
 	}
 
 //-----------------------------------------------------
