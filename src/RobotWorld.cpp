@@ -499,6 +499,9 @@ namespace Model
 	}
 
 	void RobotWorld::createStudentWorld2(bool notifyObserver){ //Situatie 1.1	
+		//Create World Boarder: 
+		createWorldBorder(true);
+
 		//Create Objects:
 		RobotWorld::getRobotWorld().newRobot("Robot", wxPoint(440,440), notifyObserver); // @suppress("Avoid magic numbers")
 		RobotWorld::getRobotWorld().newGoal("Goal", wxPoint(30,30), notifyObserver); // @suppress("Avoid magic numbers")
@@ -522,6 +525,8 @@ namespace Model
 	}
 
 	void RobotWorld::createStudentWorld4(bool notifyObserver){ 	//Situatie 2.1
+		//Create World Boarder: 
+		createWorldBorder(true);
 
 		//Create Objects:
  		RobotWorld::getRobotWorld().newRobot("Robot", wxPoint(475,50), notifyObserver); //Top Left Corner
@@ -552,6 +557,13 @@ namespace Model
 	}
 
 	void RobotWorld::createStudentWorld6(bool notifyObserver){ //Situatie 3.1
+		//Create World Boarder: 
+		createWorldBorder(true);
+
+		//Create Walls: 
+		RobotWorld::getRobotWorld().newWall( wxPoint(0,200), wxPoint(300,200) ,notifyObserver);
+		RobotWorld::getRobotWorld().newWall( wxPoint(500,300), wxPoint(200,300) ,notifyObserver);
+
 		//Create Objects:
  		RobotWorld::getRobotWorld().newRobot("Robot", wxPoint(450,420), notifyObserver); //Top Left Corner
 		RobotWorld::getRobotWorld().newGoal("Goal", wxPoint(50,50), notifyObserver); //Bottom left Corner
