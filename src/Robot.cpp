@@ -492,7 +492,7 @@ namespace Model
 			// Compare a float/double with another float/double: use epsilon...
 			if (std::fabs(speed - 0.0) <= std::numeric_limits<float>::epsilon())
 			{
-				setSpeed(10.0, false); // @suppress("Avoid magic numbers")
+				setSpeed(5.0, false); // @suppress("Avoid magic numbers")
 			}
 
 			if(WorldSynced){

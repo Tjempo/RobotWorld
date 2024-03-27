@@ -369,7 +369,7 @@ namespace Application
 				   wxGBPosition( 2, 2),
 				   wxGBSpan( 1, 1),
 				   wxSHRINK | wxALIGN_CENTER);
-		speedSpinCtrl->SetValue(static_cast<int>(10));
+		speedSpinCtrl->SetValue(static_cast<int>(5));
 		speedSpinCtrl->Bind(wxEVT_COMMAND_SPINCTRL_UPDATED,[this](wxCommandEvent& event){this->OnSpeedSpinCtrlUpdate(event);});
 
 		std::array<std::string,7> choicesArray
