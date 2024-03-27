@@ -371,7 +371,7 @@ namespace Model
 			case Messaging::RobotPositionRequest:{
 				aMessage.setMessageType(Messaging::RobotPositionResponse);
 				std::ostringstream os;
-				os << position.x << " " << position.y << " " << getFront().asString();
+				os << position.x << " " << position.y << " " << getFront().asString() << " " << Utils::Shape2DUtils::getAngle(front);
 				aMessage.setBody(os.str());
 				TRACE_DEVELOP("Oke here is robot location");
 
@@ -465,20 +465,23 @@ namespace Model
 	void Robot::updateRobotVector(std::string messageBody){
 		std::stringstream is(messageBody);
 		unsigned short x, y, cx, cy;
-		is >> x >> y >> cx >> cy;
+		double rotation;
+		is >> x >> y >> cx >> cy >> rotation;
 
 		TRACE_DEVELOP("Robot position received: X " + std::to_string(x));
     	TRACE_DEVELOP("Robot position received: Y " + std::to_string(y));
-	
+		TRACE_DEVELOP("Robot rotation received: " + std::to_string(rotation));
 		
 		//Update Robot position
 		if(!WorldSynced){
 			Model::RobotWorld::getRobotWorld().newRobot("Bober", wxPoint(x, y));
 			WorldSynced = true;
 		}else{
-			TRACE_DEVELOP("Ja stomme kneus dit is al true");
+			TRACE_DEVELOP("Worlds are already Synced");
 			auto robotToo =Model::RobotWorld::getRobotWorld().getRobot("Bober");
 			robotToo->setPosition(wxPoint(x, y));
+			//Set Rotation:
+			// robotToo->setFront(Utils::Shape2DUtils::getAngle(rotat));
 		}
 	}
 
@@ -503,7 +506,7 @@ namespace Model
 				if(WorldSynced){
 					Application::MainFrameWindow::requestRobotLocation();
 				}
-				
+
 				// Do the update
 				const PathAlgorithm::Vertex& vertex = path[pathPoint+=static_cast<unsigned int>(speed)];
 				front = BoundedVector( vertex.asPoint(), position);
@@ -644,16 +647,16 @@ namespace Model
 
 	void Robot::evade() {
     double angle = angleCollision();
-    if (angle < 45 || angle > 315){
+    if (angle < 22 || angle > 337){
         Application::Logger::log("turning left");
-		turnAround();
+        turnAround();
 
-    }else if (angle > 225 && angle <= 315){
+    }else if (angle > 202 && angle <= 337){
         Application::Logger::log("continuing");
         driving = true;
-    }else if (angle > 135 && angle <= 225){
+    }else if (angle > 158 && angle <= 202){
         Application::Logger::log("no collision");
-    }else if (angle > 45 && angle <= 135){
+    }else if (angle > 22 && angle <= 158){
         Application::Logger::log("waiting");
         while (robotCollision()){
             driving = false;
