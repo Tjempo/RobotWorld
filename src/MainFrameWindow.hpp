@@ -29,9 +29,11 @@ namespace Application
 			 *
 			 * @param aTitle The title which is shown in the title bar
 			 */
-			explicit MainFrameWindow( const std::string& aTitle);
+			void sendRobotLocation();
+			static void requestRobotLocation();
+            explicit MainFrameWindow(const std::string &aTitle);
 
-		protected:
+        protected:
 			/**
 			 *
 			 */
@@ -68,6 +70,7 @@ namespace Application
 			 *
 			 */
 			wxPanel* initialiseButtonPanel();
+
 
 		protected:
 

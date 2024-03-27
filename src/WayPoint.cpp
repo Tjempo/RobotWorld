@@ -113,4 +113,5 @@ wxSize WayPoint::getSize() const
 
 		return os.str();
 	}
+
 } // namespace Model

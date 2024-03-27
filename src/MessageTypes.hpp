@@ -20,7 +20,14 @@ namespace Messaging
 		GenericRequest,
 		GenericResponse,
 		EchoRequest,
-		EchoResponse
+		EchoResponse,
+		//Synchronization:
+		SyncWorldRequest,
+		SyncWorldResponse,
+		//Robot Position:
+		RobotPositionRequest,
+		RobotPositionResponse
+		//Goal Position:
 	};
 	//@}
 } /* namespace Messaging */

@@ -416,7 +416,13 @@ namespace Model
 		os << "\n\n";
 		return os.str();
 	}
-	/**
+
+	void RobotWorld::addRobot(RobotPtr robot){
+		//Add robot to the robots vector:
+		robots.push_back(robot);
+		notifyObservers();
+	}
+	/**z
 	 *
 	 */
 	std::string RobotWorld::asString() const
@@ -493,13 +499,13 @@ namespace Model
 
 	void RobotWorld::createStudentWorld2(bool notifyObserver){ //Situatie 1.1	
 		//Create Objects:
-		RobotWorld::getRobotWorld().newRobot("Bober", wxPoint(440,440), notifyObserver); // @suppress("Avoid magic numbers")
+		RobotWorld::getRobotWorld().newRobot("Robot", wxPoint(440,440), notifyObserver); // @suppress("Avoid magic numbers")
 		RobotWorld::getRobotWorld().newGoal("Goal", wxPoint(30,30), notifyObserver); // @suppress("Avoid magic numbers")
 
 		//Notify
 		notifyObservers();
 	}
-
+ 
 // ------------------------------ Situation 2:
 
 	void RobotWorld::createStudentWorld3(bool notifyObserver){ //Situatie 2.0
@@ -517,7 +523,7 @@ namespace Model
 	void RobotWorld::createStudentWorld4(bool notifyObserver){ 	//Situatie 2.1
 
 		//Create Objects:
- 		RobotWorld::getRobotWorld().newRobot("Bober", wxPoint(475,50), notifyObserver); //Top Left Corner
+ 		RobotWorld::getRobotWorld().newRobot("Robot", wxPoint(475,50), notifyObserver); //Top Left Corner
 		RobotWorld::getRobotWorld().newGoal("Goal", wxPoint(50,475), notifyObserver); //Bottom left Corner
 
 		//Notify:
@@ -546,7 +552,7 @@ namespace Model
 
 	void RobotWorld::createStudentWorld6(bool notifyObserver){ //Situatie 3.1
 		//Create Objects:
- 		RobotWorld::getRobotWorld().newRobot("Bober", wxPoint(450,420), notifyObserver); //Top Left Corner
+ 		RobotWorld::getRobotWorld().newRobot("Robot", wxPoint(450,420), notifyObserver); //Top Left Corner
 		RobotWorld::getRobotWorld().newGoal("Goal", wxPoint(50,50), notifyObserver); //Bottom left Corner
 
 		//Notify:
@@ -564,3 +570,5 @@ namespace Model
 	}
 
 } // namespace Model
+
+

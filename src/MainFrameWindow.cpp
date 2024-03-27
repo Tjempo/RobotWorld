@@ -653,24 +653,24 @@ namespace Application
 	 */
 	void MainFrameWindow::OnStartRobot( wxCommandEvent& UNUSEDPARAM(anEvent))
 	{
-		// for(Model::RobotPtr robot : Model::RobotWorld::getRobotWorld().getRobots())
-		// {
-		// 	if (robot && !robot->isActing())
-		// 	{	
-		// 		robot->getGoalName();
-
-		// 		robot->startActing();
-		// 	}else{
-		// 		TRACE_DEVELOP("Robot is already acting");
-		// 	}
-		// }
-
-
-		Model::RobotPtr robot = Model::RobotWorld::getRobotWorld().getRobot( "Robot");
-		if (robot && !robot->isActing())
+		for(Model::RobotPtr robot : Model::RobotWorld::getRobotWorld().getRobots())
 		{
-			robot->startActing();
+			if (robot && !robot->isActing())
+			{	
+				robot->getGoalName();
+
+				robot->startActing();
+			}else{
+				TRACE_DEVELOP("Robot is already acting");
+			}
 		}
+
+
+		// Model::RobotPtr robot = Model::RobotWorld::getRobotWorld().getRobot( "Robot");
+		// if (robot && !robot->isActing())
+		// {
+		// 	robot->startActing();
+		// }
 	}
 	/**
 	 *
@@ -754,7 +754,7 @@ namespace Application
 	 */
 	void MainFrameWindow::OnStartListening( wxCommandEvent& UNUSEDPARAM(anEvent))
 	{
-		Model::RobotPtr robot = Model::RobotWorld::getRobotWorld().getRobot( "Robot");
+		Model::RobotPtr robot = Model::RobotWorld::getRobotWorld().getRobot("Robot");
 		if (robot)
 		{
 			robot->startCommunicating();
@@ -765,11 +765,13 @@ namespace Application
 		TRACE_DEVELOP("Syncing world...");
 		
 	
-    for(Model::RobotPtr robot : Model::RobotWorld::getRobotWorld().getRobots()){
-		if (!robot) {
-        	continue;
-    	}
-	}
+    // for(Model::RobotPtr robot : Model::RobotWorld::getRobotWorld().getRobots()){
+	// 	if (!robot) {
+    //     	continue;
+    // 	}
+	// }
+
+		Model::RobotPtr robot = Model::RobotWorld::getRobotWorld().getRobot("Robot");
 
 		std::string remoteIpAdres = SERVER_IP;
 		std::string remotePort = SERVER_PORT;
@@ -785,13 +787,40 @@ namespace Application
 		TRACE_DEVELOP("Syncing on IP: " + remoteIpAdres);
 		TRACE_DEVELOP( "Syncing on port: " + remotePort);
 
-		
-
-
-
-
-
+		//Send Message:
+		if (robot) {
+			Messaging::Client client( remoteIpAdres, static_cast<unsigned short>(std::stoi(remotePort)), robot);
+			Messaging::Message message( Messaging::SyncWorldRequest, "I want to sync");
+			client.dispatchMessage( message);
+    	}else{
+			TRACE_DEVELOP("No robot found");
+		}
 	}
+
+
+	void MainFrameWindow::sendRobotLocation(){
+		//Todo:
+		TRACE_DEVELOP("I still have to do this...");
+	}
+
+	void MainFrameWindow::requestRobotLocation(){
+		// Model::RobotPtr robot = Model::RobotWorld::getRobotWorld().getRobots();
+		std::string remoteIpAdres = SERVER_IP;
+		std::string remotePort = SERVER_PORT;
+
+		if (MainApplication::isArgGiven("-remote_ip")) {
+			remoteIpAdres = MainApplication::getArg("-remote_ip").value;
+		}
+		if (MainApplication::isArgGiven("-remote_port")) {
+			remotePort = MainApplication::getArg("-remote_port").value;
+		}
+
+		//Send Message:
+		Messaging::Client client( remoteIpAdres, static_cast<unsigned short>(std::stoi(remotePort)), NULL);
+		Messaging::Message message( Messaging::RobotPositionRequest, "I want to know your robot position");
+		client.dispatchMessage(message);
+	}
+
 	/**
 	 *
 	 */

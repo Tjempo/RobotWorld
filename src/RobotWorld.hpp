@@ -105,6 +105,7 @@ namespace Model
 			virtual std::string asDebugString() const override;
 			//@}
 
+			void addRobot(RobotPtr aRobot);
 
 		protected:
 			RobotWorld() = default;

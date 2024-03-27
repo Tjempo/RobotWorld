@@ -78,7 +78,6 @@ namespace Model
 			 */
 			virtual std::string asDebugString() const override;
 
-			wxRegion expandedRegion() const;
 			//@}
 		protected:
 		private:

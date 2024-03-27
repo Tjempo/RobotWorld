@@ -13,6 +13,8 @@
 #include "Shape2DUtils.hpp"
 #include "Wall.hpp"
 #include "WayPoint.hpp"
+#include "MainFrameWindow.hpp"
+#include "serverConfig.hpp"
 
 #include <chrono>
 #include <ctime>
@@ -246,9 +248,8 @@ namespace Model
 	/**
 	 *
 	 */
-	bool Robot::intersects( const wxRegion& aRegion) const
-	{
-		wxRegion region = getRegion();
+	bool Robot::intersects( const wxRegion& aRegion) const{
+		wxRegion region = expandedRegion();
 		region.Intersect( aRegion);
 		return !region.IsEmpty();
 	}
@@ -362,9 +363,24 @@ namespace Model
 				aMessage.setBody( "Messaging::EchoResponse: " + aMessage.asString());
 				break;
 			}
+			case Messaging::SyncWorldRequest:{
+				aMessage.setMessageType(Messaging::SyncWorldResponse);
+				aMessage.setBody( "Messaging::SyncWorldResponse: " + aMessage.asString());
+				SyncWorld();
+				break;
+			}
+			case Messaging::RobotPositionRequest:{
+				aMessage.setMessageType(Messaging::RobotPositionResponse);
+				std::ostringstream os;
+				os << "Sending location: " << position.x << " " << position.y << " " << getFront().asString();
+				// sendRobotLocation();
+				aMessage.setBody(os.str());
+				break;
+			}
+
 			default:
 			{
-				TRACE_DEVELOP(__PRETTY_FUNCTION__ + std::string(": default not implemented"));
+				TRACE_DEVELOP(__PRETTY_FUNCTION__ + std::string(": Default: Request not implemented!"));
 				break;
 			}
 		}
@@ -385,6 +401,11 @@ namespace Model
 			}
 			case Messaging::EchoResponse:
 			{
+				break;
+			}
+			case Messaging::RobotPositionResponse:
+			{
+				updateRobotVector(aMessage.getBody());
 				break;
 			}
 			default:
@@ -420,10 +441,38 @@ namespace Model
 	/**
 	 *
 	 */
-	void Robot::drive()
-	{
-		try
-		{
+	void Robot::SyncWorld(){
+		if(!WorldSynced){
+			//ToDo: Request Goal and walls
+			TRACE_DEVELOP("I wanna have da goal of your robot OwO");
+		}
+
+		//Send robot position request
+		// Call the function requestRobotLocation(); from MainFrameWindow
+		Application::MainFrameWindow::requestRobotLocation();
+		WorldSynced = true;
+
+	}
+
+
+	void Robot::updateRobotVector(std::string messageBody){
+		std::stringstream is(messageBody);
+		signed short x, y, cx, cy;
+		is >> x >> y >> cx >> cy;
+
+		//Pushback in vector
+		// Model::RobotWorld::robots.push_back(Model::RobotWorld::getRobotWorld().newRobot("Bober", wxPoint(x, y)));
+		if(!WorldSynced){
+		Model::RobotWorld::getRobotWorld().addRobot(Model::RobotWorld::getRobotWorld().newRobot("Bober", wxPoint(x, y)));
+		}else{
+			auto robotToo = Model::RobotWorld::getRobotWorld().getRobot("Bober");
+			robotToo->setPosition(wxPoint(x, y));
+		}
+	}
+
+//-----------------------------------------------------
+	void Robot::drive(){
+		try{
 			// The runtime value always wins!!
 			speed = static_cast<float>(Application::MainApplication::getSettings().getSpeed());
 
@@ -431,6 +480,10 @@ namespace Model
 			if (std::fabs(speed - 0.0) <= std::numeric_limits<float>::epsilon())
 			{
 				setSpeed(10.0, false); // @suppress("Avoid magic numbers")
+			}
+
+			if(WorldSynced){
+				//Update Robot location
 			}
 
 			// We use the real position for starters, not an estimated position.
@@ -446,22 +499,36 @@ namespace Model
 				position.y = vertex.y;
 
 				// Stop on arrival or collision
-				 if (arrived(goal))
-                {
-                    Application::Logger::log(__PRETTY_FUNCTION__ + std::string(": arrived"));
-                    driving = false;
+				if (arrived(goal)) {
+                Application::Logger::log(
+                        __PRETTY_FUNCTION__ + std::string(": arrived"));
+                driving = false;
+            }
+            if (wallCollision()) {
+                Application::Logger::log(
+                        __PRETTY_FUNCTION__ + std::string(": wall collision"));
+                driving = false;
+            }
+            if (robotCollision()) {
+                Application::Logger::log(
+                        __PRETTY_FUNCTION__ + std::string(": robot collision"));
+                evade();
+            }
+            if (tempPointActive) {
+                if (arrived(tempPointPtr)) {
+                    tempPointActive = false;
+                    Application::Logger::log("tempPoint deleted");
+                    if (tempPointPtr){
+                    RobotWorld::getRobotWorld().deleteWayPoint(tempPointPtr);
+                    }
+                    Application::Logger::log(
+                            __PRETTY_FUNCTION__
+                                    + std::string(": evade point reached"));
+
+                    startDriving();
+
                 }
-                if (wallCollision())
-                {
-                    Application::Logger::log(__PRETTY_FUNCTION__ + std::string(": wall collision"));
-                    driving = false;
-                }
-                if (robotCollision())
-                {
-                    Application::Logger::log(__PRETTY_FUNCTION__ + std::string(": robot collision"));
-                    driving = false;
-					evade();
-                }
+            }
 
 				notifyObservers();
 
@@ -509,14 +576,20 @@ namespace Model
 	/**
 	 *
 	 */
-	bool Robot::arrived(GoalPtr aGoal)
-	{
-		if (aGoal && intersects( aGoal->getRegion()))
-		{
-			return true;
-		}
-		return false;
+	bool Robot::arrived(GoalPtr aGoal) {
+    if (aGoal && intersectsFinish(aGoal->getRegion())) {
+        return true;
+    }
+    return false;
 	}
+
+
+	bool Robot::intersectsFinish(const wxRegion &aRegion) const {
+    	wxRegion region = getRegion();
+    	region.Intersect(aRegion);
+    	return !region.IsEmpty();
+	}
+
 	/**
 	 *
 	 */
@@ -542,22 +615,19 @@ namespace Model
         return false;
     }
 
-    bool Robot::robotCollision(){
-        const std::vector< RobotPtr >& robots = RobotWorld::getRobotWorld().getRobots();
-                for (RobotPtr robot : robots)
-                {
-                    if ( getObjectId() == robot->getObjectId())
-                    {
-                        continue;
-                    }
-                    if(intersects(robot->getRegion()))
-                    {
-                        Application::Logger::log("CollisionWithRobot");
-                        return true;
-                    }
-                }
-                return false;
+    bool Robot::robotCollision() {
+    const std::vector<RobotPtr> &robots = RobotWorld::getRobotWorld().getRobots();
+    for (RobotPtr robot : robots) {
+        if (getObjectId() == robot->getObjectId()) {
+            continue;
+        }
+        if (intersects(robot->hitRegion())) {
+            Application::Logger::log("CollisionWithRobot");
+            return true;
+        }
     }
+    return false;
+}
 
 	void Robot::evade() {
     double angle = angleCollision();
@@ -604,21 +674,21 @@ double Robot::angleCollision() {
 }
 
 void Robot::turnAround() {
-    driving = true;
-    wxPoint evadePoint((getFrontRight().x + getBackRight().x) / 2,
-            (getFrontRight().y + getBackRight().y) / 2);
-    RobotWorld::getRobotWorld().newWayPoint("Point", evadePoint);
-    WayPointPtr tempPointPtr = RobotWorld::getRobotWorld().getWayPoint("Point");
-    Application::Logger::log(
-            Utils::Shape2DUtils::asString(evadePoint) + " "
-                    + Utils::Shape2DUtils::asString(position));
-    Application::Logger::log("turning");
-    calculateRoute(tempPointPtr);
-    drive();
-    if (arrived(tempPointPtr)) {
-        RobotWorld::getRobotWorld().deleteWayPoint(tempPointPtr);
-        Application::Logger::log("evadePoint reached");
-        calculateRoute(goal);
+    if (robotCollision()) {
+        if (!tempPointActive) {
+            wxPoint evadePoint((getFrontRight().x + getBackRight().x) / 2,
+                    (getFrontRight().y + getBackRight().y) / 2);
+            RobotWorld::getRobotWorld().newWayPoint("Point", evadePoint);
+            tempPointPtr = RobotWorld::getRobotWorld().getWayPoint("Point");
+            Application::Logger::log("temppoint created");
+            tempPointActive=true;
+            //Application::Logger::log(    Utils::Shape2DUtils::asString(evadePoint) + " " + Utils::Shape2DUtils::asString(position));
+        }
+        Application::Logger::log("driving to evade");
+        restartDriving();
+    } else {
+        Application::Logger::log("driving to goal");
+        startDriving();
     }
 }
 
@@ -660,26 +730,32 @@ wxRegion Robot::expandedRegion() const {
 }
 
 bool Robot::arrived(WayPointPtr tempGoal) {
-    if (tempGoal && intersects(tempGoal->expandedRegion())) {
+    if (tempGoal && intersects(tempGoal->getRegion())) {
         return true;
     }
     return false;
 }
 
-wxRegion WayPoint::expandedRegion() const
-        {
-            // x and y are pointing to top left now
-            int x = position.x - (size.x);
-            int y = position.y - (size.y);
+void Robot::restartDriving() {
+    driving = true;
+    calculateRoute(tempPointPtr);
+    drive();
+}
 
-            wxPoint originalUpperLeft( x, y);
-            wxPoint originalUpperRight( x + size.x * 2, y);
-            wxPoint originalBottomLeft( x, y + size.y * 2);
-            wxPoint originalBottomRight( x + size.x * 2, y + size.y * 2);
+wxRegion Robot::hitRegion() const {
+    // x and y are pointing to top left now
+    int x = position.x - (size.x);
+    int y = position.y - (size.y);
 
-            wxPoint originalPoints[] = { originalUpperRight, originalUpperLeft, originalBottomLeft, originalBottomRight };
+    wxPoint originalUpperLeft(x, y);
+    wxPoint originalUpperRight(x + size.x * 2, y);
+    wxPoint originalBottomLeft(x, y + size.y * 2);
+    wxPoint originalBottomRight(x + size.x * 2, y + size.y * 2);
 
-            return wxRegion( 4, originalPoints);
-        }
+    wxPoint originalPoints[] = { originalUpperRight, originalUpperLeft,
+            originalBottomLeft, originalBottomRight };
+
+    return wxRegion(4, originalPoints);
+}
 
 } // namespace Model

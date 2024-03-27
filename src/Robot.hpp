@@ -180,6 +180,8 @@ namespace Model
 			 *
 			 */
 			wxPoint getFrontLeft() const;
+
+			wxRegion hitRegion() const;
 			/**
 			 *
 			 */
@@ -248,9 +250,12 @@ namespace Model
 			 * Returns a description of the object with all data of the object usable for debugging
 			 */
 			virtual std::string asDebugString() const override;
-			//@}
+            void SyncWorld();
+            void updateRobotVector(std::string messageBody);
+            // void sendRobotLocation();
+            //@}
 
-			/**
+            /**
 			 * @name Variables for painting the sensor activity on the screen
 			 */
 			//@{
@@ -271,7 +276,8 @@ namespace Model
              *
              */
             bool arrived( GoalPtr aGoal);
-			bool arrived( WayPointPtr tempGoal);
+            bool intersectsFinish(const wxRegion &aRegion) const;
+            bool arrived(WayPointPtr tempGoal);
 
             bool wallCollision();
             bool robotCollision();
@@ -308,6 +314,8 @@ namespace Model
 			 *
 			 */
 			GoalPtr goal;
+			WayPointPtr tempPointPtr;
+
 			std::string goalName;
 			/**
 			 *
@@ -329,10 +337,14 @@ namespace Model
 			 *
 			 */
 			bool communicating;
+
+			bool tempPointActive;
 			/**
 			 *
 			 */
 			std::thread robotThread;
+
+			void restartDriving();
 			/**
 			 *
 			 */
@@ -341,6 +353,9 @@ namespace Model
 			 *
 			 */
 			Messaging::ServerPtr server;
+
+			//Bool for synced Worlds:
+			bool WorldSynced = false;
 	};
 } // namespace Model
 #endif // ROBOT_HPP_
