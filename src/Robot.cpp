@@ -370,8 +370,15 @@ namespace Model
 			}
 			case Messaging::RobotPositionRequest:{
 				aMessage.setMessageType(Messaging::RobotPositionResponse);
+
+				double rotation = Utils::Shape2DUtils::getAngle(front);
+				TRACE_DEVELOP("Front : " + std::to_string(rotation));
+
+				rotation = Utils::MathUtils::toDegrees(rotation);
+				TRACE_DEVELOP("Rotation : " + std::to_string(rotation));
+
 				std::ostringstream os;
-				os << position.x << " " << position.y << " " << getFront().asString() << " " << Utils::Shape2DUtils::getAngle(front);
+				os << position.x << " " << position.y << " " << getFront().asString() << " " << rotation;
 				aMessage.setBody(os.str());
 				TRACE_DEVELOP("Oke here is robot location");
 
@@ -471,6 +478,10 @@ namespace Model
 		TRACE_DEVELOP("Robot position received: X " + std::to_string(x));
     	TRACE_DEVELOP("Robot position received: Y " + std::to_string(y));
 		TRACE_DEVELOP("Robot rotation received: " + std::to_string(rotation));
+		TRACE_DEVELOP("CX =  " + std::to_string(cx));
+    	TRACE_DEVELOP("CY = " + std::to_string(cy));
+
+		//Update Robot position
 		
 		//Update Robot position
 		if(!WorldSynced){
@@ -481,7 +492,26 @@ namespace Model
 			auto robotToo =Model::RobotWorld::getRobotWorld().getRobot("Bober");
 			robotToo->setPosition(wxPoint(x, y));
 			//Set Rotation:
-			// robotToo->setFront(Utils::Shape2DUtils::getAngle(rotat));
+			// Convert rotation angle to radians
+			double radians = rotation * (M_PI / 180.0);
+
+			// Calculate the x and y components of the rotation vector
+			double dx = cos(radians); // Calculate x-component of vector
+			double dy = sin(radians); // Calculate y-component of vector
+
+			// Ensure the vector has unit length
+			double length = sqrt(dx * dx + dy * dy);
+			if (length > 0) {
+				dx /= length;
+				dy /= length;
+			}
+
+			 Model::BoundedVector rotationVector(dx, dy);
+
+			// Update Robot rotation: 
+			TRACE_DEVELOP("Rotation Vector: " + rotationVector.asString());
+        	// Set Rotation:
+        	robotToo->setFront(rotationVector, true);
 		}
 	}
 
@@ -528,7 +558,7 @@ namespace Model
             if (robotCollision()) {
                 Application::Logger::log(
                         __PRETTY_FUNCTION__ + std::string(": robot collision"));
-                evade();
+                // evade();
             }
             if (tempPointActive) {
                 if (arrived(tempPointPtr)) {
@@ -639,27 +669,33 @@ namespace Model
         }
         if (intersects(robot->hitRegion())) {
             Application::Logger::log("CollisionWithRobot");
+			evade();
             return true;
         }
     }
     return false;
 }
 
-	void Robot::evade() {
+void Robot::evade() {
     double angle = angleCollision();
-    if (angle < 22 || angle > 337){
+    if (angle <= 11 || angle > 349) {
         Application::Logger::log("turning left");
+        Application::Logger::log(std::to_string(angle));
         turnAround();
 
-    }else if (angle > 202 && angle <= 337){
+    } else if (angle > 191 && angle <= 349) {
         Application::Logger::log("continuing");
+        Application::Logger::log(std::to_string(angle));
         driving = true;
-    }else if (angle > 158 && angle <= 202){
+    } else if (angle > 169 && angle <= 191) {
         Application::Logger::log("no collision");
-    }else if (angle > 22 && angle <= 158){
+        Application::Logger::log(std::to_string(angle));
+    } else if (angle > 11 && angle <= 169) {
         Application::Logger::log("waiting");
-        while (robotCollision()){
+        Application::Logger::log(std::to_string(angle));
+        while (robotCollision()) {
             driving = false;
+			std::this_thread::sleep_for( std::chrono::milliseconds(100));
         }
         driving = true;
     }
@@ -673,17 +709,15 @@ double Robot::angleCollision() {
         if (getObjectId() == robot->getObjectId()) {
             continue;
         }
-        if (intersects(robot->getRegion())) {
             angle = Utils::Shape2DUtils::getAngle(this->position, robot->position);
             angle = Utils::MathUtils::toDegrees(angle);
             double currentAngle = Utils::Shape2DUtils::getAngle(front);
             currentAngle = Utils::MathUtils::toDegrees(currentAngle);
             angle = angle - currentAngle;
-            if (angle < 0){
-                angle = 360 + angle;
-            }
-            Application::Logger::log(std::to_string(angle));
+        if (angle < 0){
+            angle = 360 + angle;
         }
+            Application::Logger::log(std::to_string(angle));
     }
 
     return angle;
