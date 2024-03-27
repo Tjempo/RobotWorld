@@ -181,6 +181,9 @@ namespace Model
 		calculateRoute(goal);
 
 		drive();
+		if(WorldSynced){
+			Application::MainFrameWindow::requestRobotLocation();
+		}
 	}
 	/**
 	 *
@@ -517,10 +520,7 @@ namespace Model
 
 			unsigned pathPoint = 0;
 			while (position.x > 0 && position.x < 500 && position.y > 0 && position.y < 500 && pathPoint < path.size()) // @suppress("Avoid magic numbers")
-			{	
-				if(WorldSynced){
-					Application::MainFrameWindow::requestRobotLocation();
-				}
+			{
 
 				// Do the update
 				const PathAlgorithm::Vertex& vertex = path[pathPoint+=static_cast<unsigned int>(speed)];
@@ -678,11 +678,7 @@ void Robot::evade() {
     } else if (angle > 11 && angle <= 169) {
         Application::Logger::log("waiting");
         Application::Logger::log(std::to_string(angle));
-        while (robotCollision()) {
-            driving = false;
-			std::this_thread::sleep_for( std::chrono::milliseconds(100));
-        }
-        driving = true;
+		std::this_thread::sleep_for( std::chrono::milliseconds(500));
     }
 }
 
@@ -774,13 +770,13 @@ void Robot::restartDriving() {
 
 wxRegion Robot::hitRegion() const {
     // x and y are pointing to top left now
-    int x = position.x - (size.x);
-    int y = position.y - (size.y);
+    int x = position.x - (size.x * 2);
+    int y = position.y - (size.y * 2);
 
     wxPoint originalUpperLeft(x, y);
-    wxPoint originalUpperRight(x + size.x * 2, y);
-    wxPoint originalBottomLeft(x, y + size.y * 2);
-    wxPoint originalBottomRight(x + size.x * 2, y + size.y * 2);
+    wxPoint originalUpperRight(x + size.x * 4, y);
+    wxPoint originalBottomLeft(x, y + size.y * 4);
+    wxPoint originalBottomRight(x + size.x * 4, y + size.y * 4);
 
     wxPoint originalPoints[] = { originalUpperRight, originalUpperLeft,
             originalBottomLeft, originalBottomRight };
