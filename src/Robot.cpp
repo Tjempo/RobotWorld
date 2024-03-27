@@ -496,7 +496,7 @@ namespace Model
 			}
 
 			if(WorldSynced){
-				//Update Robot location
+				Application::MainFrameWindow::requestRobotLocation();
 			}
 
 			// We use the real position for starters, not an estimated position.

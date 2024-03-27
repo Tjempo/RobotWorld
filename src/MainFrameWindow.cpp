@@ -653,6 +653,7 @@ namespace Application
 	 */
 	void MainFrameWindow::OnStartRobot( wxCommandEvent& UNUSEDPARAM(anEvent))
 	{
+		/*
 		for(Model::RobotPtr robot : Model::RobotWorld::getRobotWorld().getRobots())
 		{
 			if (robot && !robot->isActing())
@@ -664,13 +665,14 @@ namespace Application
 				TRACE_DEVELOP("Robot is already acting");
 			}
 		}
+		*/
 
 
-		// Model::RobotPtr robot = Model::RobotWorld::getRobotWorld().getRobot( "Robot");
-		// if (robot && !robot->isActing())
-		// {
-		// 	robot->startActing();
-		// }
+		Model::RobotPtr robot = Model::RobotWorld::getRobotWorld().getRobot("Robot");
+		if (robot && !robot->isActing())
+		{
+			robot->startActing();
+		}
 	}
 	/**
 	 *
