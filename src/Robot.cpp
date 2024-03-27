@@ -455,8 +455,7 @@ namespace Model
 	 */
 	void Robot::SyncWorld(){
 		if(!WorldSynced){
-			//ToDo: Request Goal and walls
-			TRACE_DEVELOP("Imma add the walls and goals OwO");
+			TRACE_DEVELOP("World is not synced");
 		}
 		//Send robot position request
 		Application::MainFrameWindow::requestRobotLocation();
@@ -495,21 +494,22 @@ namespace Model
 				setSpeed(5.0, false); // @suppress("Avoid magic numbers")
 			}
 
-			if(WorldSynced){
-				Application::MainFrameWindow::requestRobotLocation();
-			}
-
 			// We use the real position for starters, not an estimated position.
 			startPosition = position;
 
 			unsigned pathPoint = 0;
 			while (position.x > 0 && position.x < 500 && position.y > 0 && position.y < 500 && pathPoint < path.size()) // @suppress("Avoid magic numbers")
-			{
+			{	
+				if(WorldSynced){
+					Application::MainFrameWindow::requestRobotLocation();
+				}
+				
 				// Do the update
 				const PathAlgorithm::Vertex& vertex = path[pathPoint+=static_cast<unsigned int>(speed)];
 				front = BoundedVector( vertex.asPoint(), position);
 				position.x = vertex.x;
 				position.y = vertex.y;
+
 
 				// Stop on arrival or collision
 				if (arrived(goal)) {
