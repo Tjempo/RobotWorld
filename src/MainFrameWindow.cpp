@@ -808,6 +808,8 @@ namespace Application
 		std::string remoteIpAdres = SERVER_IP;
 		std::string remotePort = SERVER_PORT;
 
+		Model::RobotPtr robot = Model::RobotWorld::getRobotWorld().getRobot("Robot");
+
 		if (MainApplication::isArgGiven("-remote_ip")) {
 			remoteIpAdres = MainApplication::getArg("-remote_ip").value;
 		}
@@ -815,8 +817,11 @@ namespace Application
 			remotePort = MainApplication::getArg("-remote_port").value;
 		}
 
+		// TRACE_DEVELOP("Requesting robot location on IP: " + remoteIpAdres);
+		// TRACE_DEVELOP( "Requesting robot location on port: " + remotePort);
+
 		//Send Message:
-		Messaging::Client client( remoteIpAdres, static_cast<unsigned short>(std::stoi(remotePort)), NULL);
+		Messaging::Client client( remoteIpAdres, static_cast<unsigned short>(std::stoi(remotePort)), robot); //Mogelijk probleem...
 		Messaging::Message message( Messaging::RobotPositionRequest, "I want to know your robot position");
 		client.dispatchMessage(message);
 	}

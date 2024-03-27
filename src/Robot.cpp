@@ -366,15 +366,16 @@ namespace Model
 			case Messaging::SyncWorldRequest:{
 				aMessage.setMessageType(Messaging::SyncWorldResponse);
 				aMessage.setBody( "Messaging::SyncWorldResponse: " + aMessage.asString());
-				SyncWorld();
 				break;
 			}
 			case Messaging::RobotPositionRequest:{
 				aMessage.setMessageType(Messaging::RobotPositionResponse);
 				std::ostringstream os;
-				os << "Sending location: " << position.x << " " << position.y << " " << getFront().asString();
-				// sendRobotLocation();
+				os << position.x << " " << position.y << " " << getFront().asString();
 				aMessage.setBody(os.str());
+				// aMessage.setBody("RobotPositionRequest is now handled");
+
+				TRACE_DEVELOP("Oke here is robot location");
 				break;
 			}
 
@@ -406,6 +407,13 @@ namespace Model
 			case Messaging::RobotPositionResponse:
 			{
 				updateRobotVector(aMessage.getBody());
+				TRACE_DEVELOP("Robot position received: " + aMessage.getBody());
+				break;
+			}
+			case Messaging::SyncWorldResponse:
+			{
+				TRACE_DEVELOP("Yeah boy! Syncing!");
+				SyncWorld();
 				break;
 			}
 			default:
@@ -444,11 +452,10 @@ namespace Model
 	void Robot::SyncWorld(){
 		if(!WorldSynced){
 			//ToDo: Request Goal and walls
-			TRACE_DEVELOP("I wanna have da goal of your robot OwO");
+			TRACE_DEVELOP("Imma add the walls and goals OwO");
 		}
 
 		//Send robot position request
-		// Call the function requestRobotLocation(); from MainFrameWindow
 		Application::MainFrameWindow::requestRobotLocation();
 		WorldSynced = true;
 
@@ -457,17 +464,22 @@ namespace Model
 
 	void Robot::updateRobotVector(std::string messageBody){
 		std::stringstream is(messageBody);
-		signed short x, y, cx, cy;
+		unsigned short x, y, cx, cy;
 		is >> x >> y >> cx >> cy;
 
-		//Pushback in vector
-		// Model::RobotWorld::robots.push_back(Model::RobotWorld::getRobotWorld().newRobot("Bober", wxPoint(x, y)));
+		TRACE_DEVELOP("Robot position received: X = " + x);
+		TRACE_DEVELOP("Robot position received: Y = " + y);
+
+		//Update Robot position
+
 		if(!WorldSynced){
-		Model::RobotWorld::getRobotWorld().addRobot(Model::RobotWorld::getRobotWorld().newRobot("Bober", wxPoint(x, y)));
-		}else{
+			Model::RobotWorld::getRobotWorld().newRobot("Bober", wxPoint(x, y));
+		}
+		else{
 			auto robotToo = Model::RobotWorld::getRobotWorld().getRobot("Bober");
 			robotToo->setPosition(wxPoint(x, y));
 		}
+		
 	}
 
 //-----------------------------------------------------
