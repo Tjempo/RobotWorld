@@ -372,13 +372,16 @@ namespace Model
 				aMessage.setMessageType(Messaging::RobotPositionResponse);
 
 				double rotation = Utils::Shape2DUtils::getAngle(front);
-				TRACE_DEVELOP("Front : " + std::to_string(rotation));
+				// TRACE_DEVELOP("Front : " + std::to_string(rotation));
 
 				rotation = Utils::MathUtils::toDegrees(rotation);
 				TRACE_DEVELOP("Rotation : " + std::to_string(rotation));
 
+				TRACE_DEVELOP("Front: " + getFront().asString());
+
 				std::ostringstream os;
-				os << position.x << " " << position.y << " " << getFront().asString() << " " << rotation;
+				os << position.x << " " << position.y << " " << getFront().asString();
+
 				aMessage.setBody(os.str());
 				TRACE_DEVELOP("Oke here is robot location");
 
@@ -471,18 +474,16 @@ namespace Model
 
 	void Robot::updateRobotVector(std::string messageBody){
 		std::stringstream is(messageBody);
-		unsigned short x, y, cx, cy;
-		double rotation;
-		is >> x >> y >> cx >> cy >> rotation;
+    	unsigned short x, y;
+		signed short frontX, frontY;
+    	// Parse x, y, frontX, and frontY
+    	is >> x >> y >> frontX >> frontY;
 
 		TRACE_DEVELOP("Robot position received: X " + std::to_string(x));
     	TRACE_DEVELOP("Robot position received: Y " + std::to_string(y));
-		TRACE_DEVELOP("Robot rotation received: " + std::to_string(rotation));
-		TRACE_DEVELOP("CX =  " + std::to_string(cx));
-    	TRACE_DEVELOP("CY = " + std::to_string(cy));
-
-		//Update Robot position
-		
+		TRACE_DEVELOP("frontX =  " + std::to_string(frontX));
+    	TRACE_DEVELOP("frontY = " + std::to_string(frontY));
+	
 		//Update Robot position
 		if(!WorldSynced){
 			Model::RobotWorld::getRobotWorld().newRobot("Bober", wxPoint(x, y));
@@ -490,27 +491,11 @@ namespace Model
 		}else{
 			TRACE_DEVELOP("Worlds are already Synced");
 			auto robotToo =Model::RobotWorld::getRobotWorld().getRobot("Bober");
+			//Set position:
 			robotToo->setPosition(wxPoint(x, y));
-			//Set Rotation:
-			// Convert rotation angle to radians
-			double radians = rotation * (M_PI / 180.0);
 
-			// Calculate the x and y components of the rotation vector
-			double dx = cos(radians); // Calculate x-component of vector
-			double dy = sin(radians); // Calculate y-component of vector
-
-			// Ensure the vector has unit length
-			double length = sqrt(dx * dx + dy * dy);
-			if (length > 0) {
-				dx /= length;
-				dy /= length;
-			}
-
-			 Model::BoundedVector rotationVector(dx, dy);
-
-			// Update Robot rotation: 
-			TRACE_DEVELOP("Rotation Vector: " + rotationVector.asString());
-        	// Set Rotation:
+			//Set rotation:
+			Model::BoundedVector rotationVector(frontX, frontY);
         	robotToo->setFront(rotationVector, true);
 		}
 	}
@@ -724,7 +709,6 @@ double Robot::angleCollision() {
 }
 
 void Robot::turnAround() {
-    if (robotCollision()) {
         if (!tempPointActive) {
             wxPoint evadePoint((getFrontRight().x + getBackRight().x) / 2,
                     (getFrontRight().y + getBackRight().y) / 2);
@@ -736,10 +720,6 @@ void Robot::turnAround() {
         }
         Application::Logger::log("driving to evade");
         restartDriving();
-    } else {
-        Application::Logger::log("driving to goal");
-        startDriving();
-    }
 }
 
 wxRegion Robot::expandedRegion() const {

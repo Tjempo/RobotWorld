@@ -101,7 +101,7 @@ namespace Model
 	{
 		std::ostringstream os;
 
-		os << "(" << x << "," << y << ")";
+		os << x << " " << y;
 
 		return os.str();
 	}
