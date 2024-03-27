@@ -457,8 +457,6 @@ namespace Model
 
 		//Send robot position request
 		Application::MainFrameWindow::requestRobotLocation();
-		WorldSynced = true;
-
 	}
 
 
@@ -467,18 +465,22 @@ namespace Model
 		unsigned short x, y, cx, cy;
 		is >> x >> y >> cx >> cy;
 
-		TRACE_DEVELOP("Robot position received: X = " + x);
-		TRACE_DEVELOP("Robot position received: Y = " + y);
-
+		TRACE_DEVELOP("Robot position received: X " + std::to_string(x));
+    	TRACE_DEVELOP("Robot position received: Y " + std::to_string(y));
+	
+		
 		//Update Robot position
-
 		if(!WorldSynced){
 			Model::RobotWorld::getRobotWorld().newRobot("Bober", wxPoint(x, y));
+			WorldSynced = true;
+		}else{
+			TRACE_DEVELOP("Ja stomme kneus dit is al true");
 		}
-		else{
-			auto robotToo = Model::RobotWorld::getRobotWorld().getRobot("Bober");
-			robotToo->setPosition(wxPoint(x, y));
-		}
+
+		// else{
+		// 	auto robotToo = Model::RobotWorld::getRobotWorld().getRobot("Bober");
+		// 	robotToo->setPosition(wxPoint(x, y));
+		// }
 		
 	}
 
