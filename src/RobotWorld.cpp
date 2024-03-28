@@ -550,8 +550,8 @@ namespace Model
 		createWorldBorder(true);
 
 		//Create Walls: 
-		RobotWorld::getRobotWorld().newWall( wxPoint(0,200), wxPoint(300,200) ,notifyObserver);
-		RobotWorld::getRobotWorld().newWall( wxPoint(500,300), wxPoint(200,300) ,notifyObserver);
+		RobotWorld::getRobotWorld().newWall(wxPoint(0,200), wxPoint(350,200) ,notifyObserver); //Top Wall
+		RobotWorld::getRobotWorld().newWall(wxPoint(500,300), wxPoint(150,300) ,notifyObserver); //Bottom Wall
 
 		//Create Objects:
  		RobotWorld::getRobotWorld().newRobot("Robot", wxPoint(100,100), notifyObserver); // Top Left Corner
@@ -567,8 +567,8 @@ namespace Model
 		createWorldBorder(true);
 
 		//Create Walls: 
-		RobotWorld::getRobotWorld().newWall( wxPoint(0,200), wxPoint(300,200) ,notifyObserver);
-		RobotWorld::getRobotWorld().newWall( wxPoint(500,300), wxPoint(200,300) ,notifyObserver);
+		RobotWorld::getRobotWorld().newWall(wxPoint(0,200), wxPoint(350,200) ,notifyObserver); //Top Wall
+		RobotWorld::getRobotWorld().newWall(wxPoint(500,300), wxPoint(150,300) ,notifyObserver); //Bottom Wall
 
 		//Create Objects:
  		RobotWorld::getRobotWorld().newRobot("Robot", wxPoint(400,400), notifyObserver); //Top Left Corner

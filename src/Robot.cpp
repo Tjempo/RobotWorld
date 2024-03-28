@@ -537,7 +537,7 @@ namespace Model
                 Application::Logger::log(
                         __PRETTY_FUNCTION__ + std::string(": arrived"));
                 driving = false;
-				for(short i = 0; i < 100; i++){
+				for(short i = 0; i < 250; i++){
 					std::this_thread::sleep_for( std::chrono::milliseconds(100));
 					Application::MainFrameWindow::requestRobotLocation();
 				}
