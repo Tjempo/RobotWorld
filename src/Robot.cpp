@@ -47,7 +47,8 @@ namespace Model
 								speed( 0.0),
 								acting(false),
 								driving(false),
-								communicating(false)
+								communicating(false),
+								tempPointActive(false)
 	{
 		// We use the real position for starters, not an estimated position.
 		startPosition = position;
@@ -181,9 +182,6 @@ namespace Model
 		calculateRoute(goal);
 
 		drive();
-		if(WorldSynced){
-			Application::MainFrameWindow::requestRobotLocation();
-		}
 	}
 	/**
 	 *
@@ -191,6 +189,10 @@ namespace Model
 	void Robot::stopDriving()
 	{
 		driving = false;
+		if(WorldSynced){
+			// std::this_thread::sleep_for( std::chrono::milliseconds(200));
+			Application::MainFrameWindow::requestRobotLocation();
+		}
 	}
 	/**
 	 *
@@ -388,9 +390,9 @@ namespace Model
 				aMessage.setBody(os.str());
 				TRACE_DEVELOP("Oke here is robot location");
 
-				//Request robot from other side
+				// Request robot from other side
 				// if(!WorldSynced){
-				// 	TRACE_DEVELOP("Getting other Robot");
+				// 	TRACE_DEVELOP("Getting other Robot Info");
 				// 	Application::MainFrameWindow::requestRobotLocation();
 				// }
 				break;
@@ -521,6 +523,7 @@ namespace Model
 			unsigned pathPoint = 0;
 			while (position.x > 0 && position.x < 500 && position.y > 0 && position.y < 500 && pathPoint < path.size()) // @suppress("Avoid magic numbers")
 			{
+				Application::MainFrameWindow::requestRobotLocation();
 
 				// Do the update
 				const PathAlgorithm::Vertex& vertex = path[pathPoint+=static_cast<unsigned int>(speed)];
@@ -534,6 +537,11 @@ namespace Model
                 Application::Logger::log(
                         __PRETTY_FUNCTION__ + std::string(": arrived"));
                 driving = false;
+				for(short i = 0; i < 10; i++){
+					std::this_thread::sleep_for( std::chrono::milliseconds(100));
+					Application::MainFrameWindow::requestRobotLocation();
+				}
+
             }
             if (wallCollision()) {
                 Application::Logger::log(
@@ -678,7 +686,14 @@ void Robot::evade() {
     } else if (angle > 11 && angle <= 169) {
         Application::Logger::log("waiting");
         Application::Logger::log(std::to_string(angle));
-		std::this_thread::sleep_for( std::chrono::milliseconds(500));
+		for(short i = 0; i < 10; i++){
+			std::this_thread::sleep_for( std::chrono::milliseconds(100));
+			Application::MainFrameWindow::requestRobotLocation();
+		}
+
+		// driving = false;
+		// startDriving();
+
     }
 }
 

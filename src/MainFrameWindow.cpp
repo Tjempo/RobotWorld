@@ -748,7 +748,6 @@ namespace Application
 	void MainFrameWindow::OnUnpopulate( wxCommandEvent& UNUSEDPARAM(anEvent))
 	{
 		robotWorldCanvas->unpopulate();
-
 		logTextCtrl->Clear();
 	}
 	/**
@@ -765,13 +764,6 @@ namespace Application
 
 	void MainFrameWindow::Sync(wxCommandEvent& UNUSEDPARAM(anEvent)){
 		TRACE_DEVELOP("Syncing world...");
-		
-	
-    // for(Model::RobotPtr robot : Model::RobotWorld::getRobotWorld().getRobots()){
-	// 	if (!robot) {
-    //     	continue;
-    // 	}
-	// }
 
 		Model::RobotPtr robot = Model::RobotWorld::getRobotWorld().getRobot("Robot");
 
