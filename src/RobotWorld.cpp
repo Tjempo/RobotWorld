@@ -550,8 +550,12 @@ namespace Model
 		createWorldBorder(true);
 
 		//Create Walls: 
-		RobotWorld::getRobotWorld().newWall(wxPoint(0,200), wxPoint(350,200) ,notifyObserver); //Top Wall
-		RobotWorld::getRobotWorld().newWall(wxPoint(500,300), wxPoint(150,300) ,notifyObserver); //Bottom Wall
+		RobotWorld::getRobotWorld().newWall(wxPoint(0,200), wxPoint(400,200) ,notifyObserver); //Top Wall
+		RobotWorld::getRobotWorld().newWall(wxPoint(400,200), wxPoint(400,220) ,notifyObserver); //Top Wall Fliepeltje
+
+		RobotWorld::getRobotWorld().newWall(wxPoint(500,300), wxPoint(100,300) ,notifyObserver); //Bottom Wall
+		RobotWorld::getRobotWorld().newWall(wxPoint(100,300), wxPoint(100,280) ,notifyObserver); //Bottom Wall Fliepeltje
+
 
 		//Create Objects:
  		RobotWorld::getRobotWorld().newRobot("Robot", wxPoint(100,100), notifyObserver); // Top Left Corner
@@ -567,8 +571,11 @@ namespace Model
 		createWorldBorder(true);
 
 		//Create Walls: 
-		RobotWorld::getRobotWorld().newWall(wxPoint(0,200), wxPoint(350,200) ,notifyObserver); //Top Wall
-		RobotWorld::getRobotWorld().newWall(wxPoint(500,300), wxPoint(150,300) ,notifyObserver); //Bottom Wall
+		RobotWorld::getRobotWorld().newWall(wxPoint(0,200), wxPoint(400,200) ,notifyObserver); //Top Wall
+		RobotWorld::getRobotWorld().newWall(wxPoint(400,200), wxPoint(400,220) ,notifyObserver); //Top Wall Fliepeltje
+
+		RobotWorld::getRobotWorld().newWall(wxPoint(500,300), wxPoint(100,300) ,notifyObserver); //Bottom Wall
+		RobotWorld::getRobotWorld().newWall(wxPoint(100,300), wxPoint(100,280) ,notifyObserver); //Bottom Wall Fliepeltje
 
 		//Create Objects:
  		RobotWorld::getRobotWorld().newRobot("Robot", wxPoint(400,400), notifyObserver); //Top Left Corner
