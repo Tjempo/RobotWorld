@@ -423,6 +423,12 @@ namespace Model
 		robots.push_back(robot);
 		notifyObservers();
 	}
+
+	void RobotWorld::clearWaypoints(){
+		wayPoints.clear();
+		notifyObservers();
+	}
+
 	/**z
 	 *
 	 */
@@ -565,7 +571,7 @@ namespace Model
 		RobotWorld::getRobotWorld().newWall( wxPoint(500,300), wxPoint(200,300) ,notifyObserver);
 
 		//Create Objects:
- 		RobotWorld::getRobotWorld().newRobot("Robot", wxPoint(450,420), notifyObserver); //Top Left Corner
+ 		RobotWorld::getRobotWorld().newRobot("Robot", wxPoint(400,400), notifyObserver); //Top Left Corner
 		RobotWorld::getRobotWorld().newGoal("Goal", wxPoint(50,50), notifyObserver); //Bottom left Corner
 
 		//Notify:

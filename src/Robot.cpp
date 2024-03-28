@@ -189,10 +189,10 @@ namespace Model
 	void Robot::stopDriving()
 	{
 		driving = false;
-		if(WorldSynced){
-			// std::this_thread::sleep_for( std::chrono::milliseconds(200));
-			Application::MainFrameWindow::requestRobotLocation();
-		}
+		// if(WorldSynced){
+		// 	// std::this_thread::sleep_for( std::chrono::milliseconds(200));
+		// 	Application::MainFrameWindow::requestRobotLocation();
+		// }
 	}
 	/**
 	 *
@@ -537,7 +537,7 @@ namespace Model
                 Application::Logger::log(
                         __PRETTY_FUNCTION__ + std::string(": arrived"));
                 driving = false;
-				for(short i = 0; i < 10; i++){
+				for(short i = 0; i < 100; i++){
 					std::this_thread::sleep_for( std::chrono::milliseconds(100));
 					Application::MainFrameWindow::requestRobotLocation();
 				}
@@ -558,7 +558,7 @@ namespace Model
                     tempPointActive = false;
                     Application::Logger::log("tempPoint deleted");
                     if (tempPointPtr){
-                    RobotWorld::getRobotWorld().deleteWayPoint(tempPointPtr);
+                    RobotWorld::getRobotWorld().clearWaypoints();
                     }
                     Application::Logger::log(
                             __PRETTY_FUNCTION__
@@ -686,14 +686,10 @@ void Robot::evade() {
     } else if (angle > 11 && angle <= 169) {
         Application::Logger::log("waiting");
         Application::Logger::log(std::to_string(angle));
-		for(short i = 0; i < 10; i++){
-			std::this_thread::sleep_for( std::chrono::milliseconds(100));
-			Application::MainFrameWindow::requestRobotLocation();
-		}
-
-		// driving = false;
-		// startDriving();
-
+        for (unsigned short i = 0; i < 100; i++) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            Application::MainFrameWindow::requestRobotLocation();
+        }
     }
 }
 
@@ -720,17 +716,16 @@ double Robot::angleCollision() {
 }
 
 void Robot::turnAround() {
-        if (!tempPointActive) {
-            wxPoint evadePoint((getFrontRight().x + getBackRight().x) / 2,
-                    (getFrontRight().y + getBackRight().y) / 2);
-            RobotWorld::getRobotWorld().newWayPoint("Point", evadePoint);
-            tempPointPtr = RobotWorld::getRobotWorld().getWayPoint("Point");
-            Application::Logger::log("temppoint created");
-            tempPointActive=true;
-            //Application::Logger::log(    Utils::Shape2DUtils::asString(evadePoint) + " " + Utils::Shape2DUtils::asString(position));
-        }
-        Application::Logger::log("driving to evade");
-        restartDriving();
+    if (!tempPointActive) {
+        wxPoint evadePoint(goal->getPosition().x,500 - goal->getPosition().y); //
+        RobotWorld::getRobotWorld().newWayPoint("Point", evadePoint);
+        tempPointPtr = RobotWorld::getRobotWorld().getWayPoint("Point");
+        Application::Logger::log("temppoint created");
+        tempPointActive = true;
+        //Application::Logger::log(    Utils::Shape2DUtils::asString(evadePoint) + " " + Utils::Shape2DUtils::asString(position));
+    }
+    Application::Logger::log("driving to evade");
+    restartDriving();
 }
 
 wxRegion Robot::expandedRegion() const {

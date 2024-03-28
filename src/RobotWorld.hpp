@@ -107,7 +107,9 @@ namespace Model
 
 			void addRobot(RobotPtr aRobot);
 
-		protected:
+            void clearWaypoints();
+
+        protected:
 			RobotWorld() = default;
 			virtual ~RobotWorld();
 
